@@ -18,13 +18,17 @@ void afficherHeure() {
         time_t temps = chrono::system_clock::to_time_t(maintenant);
         tm* heureLocale = localtime(&temps);
 
-        cout << "Heure actuelle : ";
-        cout << setfill('0') << setw(2) << heureLocale->tm_hour << ":"
+        std::cout << "Heure actuelle : ";
+        std::cout << setfill('0') << setw(2) << heureLocale->tm_hour << ":"
              << setfill('0') << setw(2) << heureLocale->tm_min << ":"
-             << setfill('0') << setw(2) << heureLocale->tm_sec << endl;
+             << setfill('0') << setw(2) << heureLocale->tm_sec << std::endl;
 
         this_thread::sleep_for(chrono::seconds(1));
-        system("clear"); // Effacer l'écran après chaque mise à jour
+         #ifdef _WIN32
+        system("cls");
+        #else 
+        system("clear");
+        #endif // Effacer l'écran après chaque mise à jour
     }
 }
 
@@ -35,17 +39,21 @@ void compteARebours(int secondes) {
         int minutes = secondes / 60;
         int sec = secondes % 60;
 
-        cout << "Compte à rebours : ";
+        std::cout << "Compte à rebours : ";
         cout << setfill('0') << setw(2) << minutes << ":"
-             << setfill('0') << setw(2) << sec << endl;
+             << setfill('0') << setw(2) << sec << std::endl;
 
         this_thread::sleep_for(chrono::seconds(1));
         --secondes;
-        system("clear"); // Effacer l'écran après chaque mise à jour
+       #ifdef _WIN32
+        system("cls");
+        #else 
+        system("clear");
+        #endif // Effacer l'écran après chaque mise à jour
     }
 
     if (!stopThread) {
-        cout << "Temps écoulé !" << endl;
+        std::cout << "Temps écoulé !" << std::endl;
     }
 }
 
@@ -63,7 +71,7 @@ void chronometre() {
     auto debut = chrono::steady_clock::now();
     stopThread = false;
 
-    cout << "Appuyez sur 's' pour arrêter le chronomètre." << endl;
+    std::cout << "Appuyez sur 's' pour arrêter le chronomètre." << std::endl;
 
     // Démarrer un thread pour lire l'entrée utilisateur
     thread t(lireInput);
@@ -75,9 +83,9 @@ void chronometre() {
         int minutes = duree.count() / 60;
         int secondes = duree.count() % 60;
 
-        cout << "Chronomètre : ";
-        cout << setfill('0') << setw(2) << minutes << ":"
-             << setfill('0') << setw(2) << secondes << endl;
+        std::cout << "Chronomètre : ";
+        std::cout << setfill('0') << setw(2) << minutes << ":"
+             << setfill('0') << setw(2) << secondes << std::endl;
 
         this_thread::sleep_for(chrono::seconds(1));
         #ifdef _WIN32
@@ -88,7 +96,7 @@ void chronometre() {
     }
 
     t.join(); // Attendre que le thread d'entrée utilisateur se termine
-    cout << "Chronomètre arrêté." << endl;
+    std::cout << "Chronomètre arrêté." << std::endl;
 }
 
 // Fonction pour l'alarme
@@ -104,7 +112,7 @@ void alarme(int heure, int minute) {
         tm* heureLocale = localtime(&temps);
 
         if (heureLocale->tm_hour == heure && heureLocale->tm_min == minute) {
-            cout << "ALERTE : L'heure de l'alarme est atteinte !" << endl;
+            std::cout << "ALERTE : L'heure de l'alarme est atteinte !" << std::endl;
             stopThread = true; // Arrêter l'alarme après qu'elle ait sonné
         }
 
@@ -119,30 +127,30 @@ int main() {
     int choix;
 
     while (true) {
-        cout << "=== Horloge en console ===" << endl;
-        cout << "1. Afficher l'heure en temps réel" << endl;
-        cout << "2. Compte à rebours" << endl;
-        cout << "3. Chronomètre" << endl;
-        cout << "4. Définir une alarme" << endl;
-        cout << "5. Quitter" << endl;
-        cout << "Choisissez une option : ";
-        cin >> choix;
+        std::cout << "=== Horloge en console ===" << std::endl;
+        std::cout << "1. Afficher l'heure en temps réel" << std::endl;
+        std::cout << "2. Compte à rebours" << std::endl;
+        std::cout << "3. Chronomètre" << std::endl;
+        std::cout << "4. Définir une alarme" << std::endl;
+        std::cout << "5. Quitter" << std::endl;
+        std::cout << "Choisissez une option : ";
+        std::cin >> choix;
 
         switch (choix) {
             case 1: {
                 stopThread = false;
                 thread t(afficherHeure);
-                cout << "Appuyez sur une touche pour revenir au menu principal." << endl;
-                cin.ignore();
-                cin.get();
+                std::cout << "Appuyez sur une touche pour revenir au menu principal." << std::endl;
+                std::cin.ignore();
+                std::cin.get();
                 stopThread = true;
                 t.join();
                 break;
             }
             case 2: {
                 int secondes;
-                cout << "Entrez le temps en secondes : ";
-                cin >> secondes;
+                std::cout << "Entrez le temps en secondes : ";
+                std::cin >> secondes;
                 compteARebours(secondes);
                 break;
             }
@@ -154,19 +162,19 @@ int main() {
             }
             case 4: {
                 int heure, minute;
-                cout << "Entrez l'heure de l'alarme (HH MM) : ";
-                cin >> heure >> minute;
+                std::cout << "Entrez l'heure de l'alarme (HH MM) : ";
+                std::cin >> heure >> minute;
                 stopThread = false;
                 thread t(alarme, heure, minute);
-                cout << "Appuyez sur 's' pour arrêter l'alarme." << endl;
+                std::cout << "Appuyez sur 's' pour arrêter l'alarme." << std::endl;
                 t.join();
                 break;
             }
             case 5:
-                cout << "Au revoir !" << endl;
+                std::cout << "Au revoir !" << std::endl;
                 return 0;
             default:
-                cout << "Choix invalide. Réessayez." << endl;
+                std::cout << "Choix invalide. Réessayez." << std::endl;
         }
     }
 }
